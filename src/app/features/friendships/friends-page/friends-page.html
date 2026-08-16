@@ -1,0 +1,299 @@
+<header class="flex h-14 items-center gap-2 border-b border-[#35363c] px-5 text-gray-300">
+  <div class="flex items-center gap-2 font-semibold text-white">
+    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path
+        d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm6.5-1a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM2 19.5C2 15.9 5.1 13 9 13s7 2.9 7 6.5c0 .8-.7 1.5-1.5 1.5h-11C2.7 21 2 20.3 2 19.5Zm14.2-6.1c3.3.4 5.8 2.7 5.8 5.6 0 .6-.4 1-1 1h-3.1c.1-.3.1-.7.1-1 0-2.2-.7-4.1-1.8-5.6Z"
+      />
+    </svg>
+
+    <span>Friends</span>
+  </div>
+
+  <button
+    (click)="activeTab.set('online')"
+    type="button"
+    class="rounded-md px-3 py-1.5 text-sm hover:bg-white/5 hover:text-white cursor-pointer"
+    [class.bg-[#3a3c43]]="activeTab() === 'online'"
+    [class.text-white]="activeTab() === 'online'"
+  >
+    Online
+  </button>
+
+  <button
+    type="button"
+    (click)="activeTab.set('all')"
+    class="rounded-md px-3 py-1.5 text-sm hover:bg-white/5 hover:text-white"
+    [class.bg-[#3a3c43]]="activeTab() === 'all'"
+    [class.text-white]="activeTab() === 'all'"
+  >
+    All
+  </button>
+
+  <button
+    (click)="openPending()"
+    type="button"
+    class="rounded-md px-3 py-1.5 text-sm hover:bg-white/5 hover:text-white cursor-pointer"
+    [class.bg-[#3a3c43]]="activeTab() === 'pending'"
+    [class.text-white]="activeTab() === 'pending'"
+  >
+    Pending
+  </button>
+
+  <button
+    (click)="activeTab.set('add')"
+    type="button"
+    class="rounded-md bg-[#5865F2] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[#4752C4] cursor-pointer"
+  >
+    Add Friend
+  </button>
+</header>
+
+@if (activeTab() === 'all') {
+  <main class="p-6">
+    <input
+      type="search"
+      (input)="onSearch($event)"
+      placeholder="Search"
+      class="w-full rounded-md border border-[#35363c] bg-[#121315] px-4 py-3 text-sm text-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:border-[#5865F2]"
+    />
+
+    <p class="mt-6 text-sm font-semibold text-gray-300">
+      All friends — {{ filteredFriends().length }}
+    </p>
+    @for (friend of filteredFriends(); track friend.friendshipId) {
+      <div class="flex items-center border-t border-[#35363c] py-3">
+        <div class="flex items-center gap-3">
+          @if (friend.avatarUrl) {
+            <img
+              [src]="friend.avatarUrl"
+              [alt]="friend.username + ' avatar'"
+              class="h-10 w-10 rounded-full object-cover"
+            />
+          } @else {
+            <div
+              class="flex h-10 w-10 items-center justify-center rounded-full bg-[#5865F2] font-semibold text-white"
+            >
+              {{ friend.username[0].toUpperCase() }}
+            </div>
+          }
+
+          <div>
+            <p class="font-semibold text-white">
+              {{ friend.username }}
+            </p>
+          </div>
+        </div>
+        <div class="ml-auto flex items-center gap-2">
+          <button
+            type="button"
+            class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-[#2b2d31] text-[#5865F2] hover:bg-[#5865F2]/10"
+            aria-label="Message"
+          >
+            <svg class="h-4.5 w-4.5" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 2C6.48 2 2 5.94 2 10.8c0 2.76 1.45 5.22 3.73 6.83-.12.98-.5 2.32-1.4 3.68a.5.5 0 0 0 .55.76c2.1-.5 3.7-1.4 4.62-2.02.8.17 1.63.25 2.5.25 5.52 0 10-3.94 10-8.5S17.52 2 12 2Z"
+              />
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            (click)="deleteFriend(friend.friendshipId)"
+            class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white"
+            aria-label="Remove friend"
+          >
+            <svg
+              class="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 6h18" />
+              <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" />
+              <path d="M19 6v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6" />
+              <path d="M10 11v6M14 11v6" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    }
+  </main>
+}
+
+@if (activeTab() === 'pending') {
+  <main class="p-6 text-white">
+    <section>
+      <h2 class="mb-3 text-sm font-semibold text-gray-300">
+        Incoming - {{ incomingRequests().length }}
+      </h2>
+
+      @for (request of incomingRequests(); track request.friendshipId) {
+        <div class="flex items-center border-t border-[#35363c] py-3">
+          <div class="flex items-center gap-2">
+            @if (request.avatarUrl) {
+              <img
+                [src]="request.avatarUrl"
+                [alt]="request.username + ' avatar'"
+                class="h-10 w-10 rounded-full object-cover"
+              />
+            } @else {
+              <div
+                class="flex h-10 w-10 items-center justify-center rounded-full bg-[#5865F2] font-semibold text-white"
+              >
+                {{ request.username[0].toUpperCase() }}
+              </div>
+            }
+            <span>{{ request.username }}</span>
+          </div>
+
+          <div class="ml-auto flex items-center gap-2">
+            <button
+              type="button"
+              (click)="acceptRequest(request.friendshipId)"
+              class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-[#2b2d31] text-green-500 hover:bg-green-500 hover:text-white"
+              aria-label="Accept"
+            >
+              <svg
+                class="h-4 w-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              (click)="rejectRequest(request.friendshipId)"
+              class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-[#2b2d31] text-red-500 hover:bg-red-500 hover:text-white"
+              aria-label="Reject"
+            >
+              <svg
+                class="h-4 w-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M18 6 6 18M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      }
+    </section>
+    <section class="mt-8">
+      <h2 class="mb-3 text-sm font-semibold text-gray-300">
+        Outgoing - {{ outgoingRequests().length }}
+      </h2>
+      @for (request of outgoingRequests(); track request.friendshipId) {
+        <div class="flex items-center border-t border-[#35363c] py-3 gap-2">
+          <div class="flex items-center gap-3">
+            @if (request.avatarUrl) {
+              <img
+                [src]="request.avatarUrl"
+                [alt]="request.username + ' avatar'"
+                class="h-10 w-10 rounded-full object-cover"
+              />
+            } @else {
+              <div
+                class="flex h-10 w-10 items-center justify-center rounded-full bg-[#5865F2] font-semibold text-white"
+              >
+                {{ request.username[0].toUpperCase() }}
+              </div>
+            }
+            <span>{{ request.username }}</span>
+          </div>
+
+          <div class="ml-auto flex items-center gap-2">
+            <button
+              type="button"
+              (click)="cancelRequest(request.friendshipId)"
+              class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-[#2b2d31] text-gray-300 hover:bg-[#3a3c43] hover:text-white"
+              aria-label="Cancel"
+            >
+              <svg
+                class="h-4 w-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M18 6 6 18M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      }
+    </section>
+  </main>
+}
+@if (activeTab() === 'online') {
+  <main class="p-6 text-white">Online</main>
+}
+@if (activeTab() === 'add') {
+  <main class="p-6 text-white">
+    <div class="max-w-5xl">
+      <h1 class="text-2xl font-bold">Add Friend</h1>
+    </div>
+    <p class="mt-3 text-balance text-gray-300">You can add friends with their username.</p>
+    <form (submit)="onAddFriendSubmit($event)" class="mt-8">
+      <div
+        class="flex items-center gap-4 rounded-2xl border bg-[#18191c] p-3"
+        [class.border-red-500]="
+          addFriendForm.username().invalid() && addFriendForm.username().touched()
+        "
+        [class.focus-within:border-red-500]="
+          addFriendForm.username().invalid() && addFriendForm.username().touched()
+        "
+        [class.border-[#3a3c43]]="
+          !(addFriendForm.username().invalid() && addFriendForm.username().touched())
+        "
+        [class.focus-within:border-[#5865F2]]="
+          !(addFriendForm.username().invalid() && addFriendForm.username().touched())
+        "
+      >
+        <input
+          type="text"
+          placeholder="Enter a username"
+          [formField]="addFriendForm.username"
+          class="min-w-0 flex-1 bg-transparent px-3 py-3 text-base text-white placeholder:text-gray-500 focus-visible:outline-none"
+        />
+        <button
+          type="submit"
+          [disabled]="addFriendForm.username().submitting()"
+          class="shrink-0 cursor-pointer rounded-lg bg-[#5865F2] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4752C4] disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Send Friend Request
+        </button>
+      </div>
+      @if (addFriendForm.username().touched() && addFriendForm.username().invalid()) {
+        <div class="px-2 mt-2 space-y-1">
+          @for (error of addFriendForm.username().errors(); track $index) {
+            <p class="text-xs font-medium text-[#f23f42]">
+              {{ error.message }}
+            </p>
+          }
+        </div>
+      }
+    </form>
+    @if (addFriendSuccess()) {
+      <div
+        class="mt-4 rounded- md border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-400"
+      >
+        {{ addFriendSuccess() }}
+      </div>
+    }
+  </main>
+}
