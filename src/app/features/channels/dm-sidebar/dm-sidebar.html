@@ -1,5 +1,5 @@
-<aside class="flex h-full flex-col text-white">
-  <div class="flex h-14 items-center border-b border-[#35363c] px-2">
+<aside class="flex h-full min-h-0 flex-col text-white">
+  <div class="flex h-14 shrink-0 items-center border-b border-[#35363c] px-2">
     <button
       type="button"
       class="flex w-full cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-left text-gray-300 transition-colors hover:bg-white/5 hover:text-white"
@@ -14,8 +14,8 @@
     </button>
   </div>
 
-  <div class="p-2">
-    <div class="mt-3 flex items-center justify-between px-3">
+  <div class="flex min-h-0 flex-1 flex-col p-2">
+    <div class="mt-3 flex shrink-0 items-center justify-between px-3">
       <span class="text-xs font-semibold uppercase text-gray-400"> Direct Messages </span>
 
       <button
@@ -25,6 +25,34 @@
       >
         +
       </button>
+    </div>
+    <div>
+      <div class="mt-2 min-h-0 flex-1 overflow-y-auto">
+        <div class="flex flex-col gap-1">
+          @for (conv of conversations(); track conv.conversationId) {
+            <div
+              class="flex items-center gap-2 cursor-pointer rounded-md px-2 py-2 hover:bg-white/5"
+            >
+              @if (conv.avatarUrl) {
+                <img
+                  [src]="conv.avatarUrl"
+                  [alt]="conv.displayName + ' avatar'"
+                  class="h-8 w-8 shrink-0 rounded-full object-cover"
+                />
+              } @else {
+                <div
+                  class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#5865F2] font-semibold text-white"
+                >
+                  {{ conv.displayName[0].toUpperCase() }}
+                </div>
+              }
+              <div class="min-w-0 flex-1">
+                <span class="block truncate">{{ conv.displayName }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
     </div>
   </div>
 

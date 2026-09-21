@@ -4,6 +4,11 @@ import { guestGuard } from './core/auth/guest.guard';
 
 export const routes: Routes = [
   {
+    path: '',
+    pathMatch: 'full',
+    redirectTo: 'channels/@me',
+  },
+  {
     path: 'register',
     loadComponent: () =>
       import('./features/auth/register-page/register-page').then((m) => m.RegisterPage),
