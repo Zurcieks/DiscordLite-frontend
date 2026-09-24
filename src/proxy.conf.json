@@ -1,7 +1,13 @@
 {
-    "/api": {
-      "target": "https://localhost:7030",
-      "secure": false,
-      "changeOrigin": true
-    }
+  "/api/**": {
+    "target": "https://localhost:7030",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/hubs/**": {
+    "target": "https://localhost:7030",
+    "secure": false,
+    "changeOrigin": true,
+    "ws": true
   }
+}

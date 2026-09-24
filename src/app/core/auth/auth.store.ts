@@ -30,6 +30,14 @@ export class AuthStore {
       };
     });
   }
+
+  setAvatarUrl(avatarUrl: string | null): void {
+    this._state.update((current) => ({
+      ...current,
+      avatarUrl,
+    }));
+  }
+
   clear() {
     this._state.set({
       userId: null,

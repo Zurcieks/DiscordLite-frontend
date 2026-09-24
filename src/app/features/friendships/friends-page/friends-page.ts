@@ -5,6 +5,7 @@ import { form, FormField, required, submit } from '@angular/forms/signals';
 import { firstValueFrom } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ApiError } from '../../../core/http/api-error';
+import { PresenceService } from '../../../core/presence/presence.service';
 
 type FriendsTab = 'online' | 'all' | 'pending' | 'add';
 type AddFriendData = {
@@ -19,16 +20,23 @@ type AddFriendData = {
 })
 export class FriendsPage implements OnInit {
   private readonly friendshipService = inject(FriendshipService);
+  protected readonly presenceService = inject(PresenceService);
   private readonly _friends = signal<FriendshipDto[]>([]);
   protected readonly friends = this._friends.asReadonly();
   protected readonly searchQuery = signal<string>('');
   protected readonly activeTab = signal<FriendsTab>('all');
+
   protected readonly filteredFriends = computed(() => {
     const query = this.searchQuery().trim().toLowerCase();
-    if (!query) {
-      return this.friends();
-    }
-    return this.friends().filter((friend) => friend.username.toLowerCase().includes(query));
+    const onlyOnline = this.activeTab() === 'online';
+
+    return this.friends().filter((friend) => {
+      const matchesSearch = friend.username.toLowerCase().includes(query);
+
+      const matchesStatus = !onlyOnline || this.presenceService.isOnline(friend.userId);
+
+      return matchesSearch && matchesStatus;
+    });
   });
   protected readonly incomingRequests = signal<FriendRequestDto[]>([]);
   protected readonly outgoingRequests = signal<FriendRequestDto[]>([]);

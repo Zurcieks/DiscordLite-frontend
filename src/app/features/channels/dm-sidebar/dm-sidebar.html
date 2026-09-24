@@ -22,6 +22,7 @@
         type="button"
         class="cursor-pointer text-lg text-gray-400 hover:text-white"
         aria-label="New direct message"
+        (click)="openModal()"
       >
         +
       </button>
@@ -31,21 +32,37 @@
         <div class="flex flex-col gap-1">
           @for (conv of conversations(); track conv.conversationId) {
             <div
-              class="flex items-center gap-2 cursor-pointer rounded-md px-2 py-2 hover:bg-white/5"
+              class="flex items-center gap-3 cursor-pointer rounded-md px-2 py-2 hover:bg-white/5"
             >
-              @if (conv.avatarUrl) {
-                <img
-                  [src]="conv.avatarUrl"
-                  [alt]="conv.displayName + ' avatar'"
-                  class="h-8 w-8 shrink-0 rounded-full object-cover"
-                />
-              } @else {
-                <div
-                  class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#5865F2] font-semibold text-white"
-                >
-                  {{ conv.displayName[0].toUpperCase() }}
-                </div>
-              }
+              <div class="relative h-8 w-8 shrink-0">
+                @if (conv.avatarUrl) {
+                  <img
+                    [src]="conv.avatarUrl"
+                    [alt]="conv.displayName + ' avatar'"
+                    class="h-full w-full rounded-full object-cover"
+                  />
+                } @else {
+                  <div
+                    class="flex h-full w-full items-center justify-center rounded-full bg-[#5865F2] font-semibold text-white"
+                  >
+                    {{ conv.displayName[0].toUpperCase() }}
+                  </div>
+                }
+
+                @if (conv.otherUserId; as userId) {
+                  @let online = presenceService.isOnline(userId);
+
+                  <span
+                    class="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#2b2d31]"
+                    [class.bg-green-500]="online"
+                    [class.bg-red-500]="!online"
+                    role="img"
+                    [attr.aria-label]="online ? 'Online' : 'Offline'"
+                    [attr.title]="online ? 'Online' : 'Offline'"
+                  ></span>
+                }
+              </div>
+
               <div class="min-w-0 flex-1">
                 <span class="block truncate">{{ conv.displayName }}</span>
               </div>
@@ -56,5 +73,19 @@
     </div>
   </div>
 
-  <div class="mt-auto">User panel</div>
+  <app-user-panel class="mt-auto block shrink-0"></app-user-panel>
 </aside>
+
+@if (isModalOpen()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+    (click)="closeModal()"
+  >
+    <div
+      class="w-full max-w-md rounded-xl bg-[#313338] p-6 shadow-2xl"
+      (click)="$event.stopPropagation()"
+    >
+      Modal content
+    </div>
+  </div>
+}

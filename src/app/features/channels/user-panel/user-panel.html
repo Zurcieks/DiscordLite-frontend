@@ -1,0 +1,108 @@
+<div class="flex items-center gap-3 bg-[#232428] px-3 py-3 text-white">
+  <button
+    type="button"
+    aria-label="Change avatar"
+    (click)="avatarDialog.showModal()"
+    class="relative h-10 w-10 shrink-0"
+  >
+    @if (user().avatarUrl; as avatarUrl) {
+      <img
+        [src]="avatarUrl"
+        alt="Twój avatar"
+        class="h-full w-full rounded-full object-cover cursor-pointer"
+      />
+    } @else {
+      <div
+        class="flex h-full w-full items-center justify-center rounded-full bg-[#5865F2] font-semibold"
+      >
+        {{ initial() }}
+      </div>
+    }
+
+    <span
+      class="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-[#232428] bg-green-500"
+      aria-hidden="true"
+    ></span>
+  </button>
+
+  <div class="min-w-0 flex-1">
+    <p class="truncate text-sm font-semibold">
+      {{ user().username }}
+    </p>
+
+    <p class="text-xs text-gray-400">Online</p>
+  </div>
+</div>
+
+<dialog
+  #avatarDialog
+  (click)="avatarDialog.close()"
+  aria-labelledby="avatar-dialog-title"
+  class="m-auto w-[calc(100%_-_2rem)] max-w-sm rounded-xl bg-[#313338] p-0 text-white backdrop:bg-black/70"
+>
+  <div class="p-6" (click)="$event.stopPropagation()">
+    <div class="flex items-center justify-between gap-4">
+      <h2 id="avatar-dialog-title" class="text-lg font-semibold">Twój avatar</h2>
+
+      <button
+        type="button"
+        aria-label="Zamknij"
+        class="cursor-pointer rounded px-2 py-1 text-gray-300 hover:bg-white/10"
+        (click)="avatarDialog.close()"
+      >
+        ✕
+      </button>
+    </div>
+
+    <div class="mt-6 flex justify-center">
+      @if (user().avatarUrl; as avatarUrl) {
+        <img
+          [src]="avatarUrl"
+          alt="Twój aktualny avatar"
+          class="h-32 w-32 rounded-full object-cover"
+        />
+      } @else {
+        <div
+          class="flex h-32 w-32 items-center justify-center rounded-full bg-[#5865F2] text-4xl font-semibold"
+        >
+          {{ initial() }}
+        </div>
+      }
+    </div>
+
+    <p class="mt-4 text-center font-medium">
+      {{ user().username }}
+    </p>
+
+    <p class="mt-4 text-center text-sm text-gray-400">
+      PNG lub JPEG, do 5 MB i 2048 x 2048 pikseli.
+    </p>
+
+    <input
+      #avatarInput
+      type="file"
+      accept="image/png,image/jpeg"
+      hidden
+      [disabled]="uploading()"
+      (change)="onAvatarSelected($event)"
+    />
+    <button
+      type="button"
+      class="mt-4 w-full cursor-pointer rounded-md bg-[#5865F2] px-4 py-2 font-medium hover:bg-[#4752C4] disabled:cursor-not-allowed disabled:opacity-50"
+      [disabled]="uploading()"
+      (click)="avatarInput.click()"
+    >
+      {{ uploading() ? 'Wysyłanie...' : 'Wybierz i zapisz avatar' }}
+    </button>
+
+    @if (uploadError(); as message) {
+      <p role="alert" class="mt-3 text-sm text-red-400">
+        {{ message }}
+      </p>
+    }
+
+    @if (uploadSuccess()) {
+      <p role="status" class="mt-3 text-sm text-green-400">Avatar został zmieniony.</p>
+    }
+  </div>
+</dialog>

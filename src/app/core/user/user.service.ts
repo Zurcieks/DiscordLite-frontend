@@ -10,4 +10,14 @@ export class UserService {
   getMyProfile() {
     return this.http.get<UserProfile>(`${environment.apiUrl}/user/me`);
   }
+
+  uploadAvatar(file: File) {
+    const body = new FormData();
+    body.append('file', file);
+
+    return this.http.post<{ avatarUrl: string | null }>(
+      `${environment.apiUrl}/user/me/avatar`,
+      body,
+    );
+  }
 }

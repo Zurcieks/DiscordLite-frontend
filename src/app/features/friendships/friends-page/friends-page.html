@@ -48,7 +48,7 @@
   </button>
 </header>
 
-@if (activeTab() === 'all') {
+@if (activeTab() === 'all' || activeTab() === 'online') {
   <main class="p-6">
     <input
       type="search"
@@ -58,7 +58,8 @@
     />
 
     <p class="mt-6 text-sm font-semibold text-gray-300">
-      All friends — {{ filteredFriends().length }}
+      {{ activeTab() === 'online' ? 'Online' : 'All friends' }}
+      — {{ filteredFriends().length }}
     </p>
     @for (friend of filteredFriends(); track friend.friendshipId) {
       <div class="flex items-center border-t border-[#35363c] py-3">
@@ -80,6 +81,14 @@
           <div>
             <p class="font-semibold text-white">
               {{ friend.username }}
+            </p>
+
+            <p
+              class="text-sm"
+              [class.text-green-400]="presenceService.isOnline(friend.userId)"
+              [class.text-gray-400]="!presenceService.isOnline(friend.userId)"
+            >
+              {{ presenceService.isOnline(friend.userId) ? 'Online' : 'Offline' }}
             </p>
           </div>
         </div>
@@ -239,9 +248,7 @@
     </section>
   </main>
 }
-@if (activeTab() === 'online') {
-  <main class="p-6 text-white">Online</main>
-}
+
 @if (activeTab() === 'add') {
   <main class="p-6 text-white">
     <div class="max-w-5xl">
